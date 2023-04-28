@@ -5,19 +5,19 @@ Edge Measurer is a board based on the [Arduino Nano BLE Sense](https://store.ard
 The BLE local name is **Mesurify-Meter** and it exposes a single BLE service (UUID: 8e7c2dae-0000-4b0d-b516-f525649c49ca) featuring the following characteristics:
 
 **IMU Characteristic**
-UUID: 8e7c2dae-0001-4b0d-b516-f525649c49ca
-Properties: notify
-Data format: array of 9 float
-Values: acceleration [G], angular velocity [dps], and magnetic field [uT]
+- UUID: 8e7c2dae-0001-4b0d-b516-f525649c49ca
+- Properties: notify
+- Data format: array of 9 float
+- Values: acceleration [G], angular velocity [dps], and magnetic field [uT]
 
 **Environment Characteristic**
-UUID: 8e7c2dae-0002-4b0d-b516-f525649c49ca
-Properties: notify
-Data format: 3 float and 5 int
-Values: proximity [0 close, 255 far], temperature [C], humidity [%], pressure [kPA], ambient light [0 dark] and color [RGB]
+- UUID: 8e7c2dae-0002-4b0d-b516-f525649c49ca
+- Properties: notify
+- Data format: 3 float and 5 int
+- Values: proximity [0 close, 255 far], temperature [C], humidity [%], pressure [kPA], ambient light [0 dark] and color [RGB]
 
 **Sampling Period Characteristic**
-UUID: 8e7c2dae-0003-4b0d-b516-f525649c49ca
-Properties: read and write
-Data format: 16-bit unsigned integer
-Values: sampling period in msec
+- UUID: 8e7c2dae-0003-4b0d-b516-f525649c49ca
+- Properties: read and write
+- Data format: 16-bit unsigned integer
+- Values: sampling period in msec
