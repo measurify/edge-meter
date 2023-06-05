@@ -12,12 +12,10 @@ run = async function(){
 		connector.write('timing', 2000);
 
 		connector.on('imu', data => { 
-			//console.log('.'); 
-			console.log('IMU values:', data) 
+			//console.log('IMU values:', data) 
 		});
 
 		connector.on('environment', data => { 
-			//console.log('.'); 
 			//console.log('Environment values:', data); 
 		});
 	});

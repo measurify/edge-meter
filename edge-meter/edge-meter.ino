@@ -1,7 +1,18 @@
+#define NANO_V1 //NANO_V2
+
 #include <Arduino_APDS9960.h>
-#include <Arduino_HTS221.h>
 #include <Arduino_LPS22HB.h>
+
+#ifdef NANO_V1
+#include <Arduino_HTS221.h>
 #include <Arduino_LSM9DS1.h>
+#endif
+
+#ifdef NANO_V2
+#include <Arduino_HS300x.h>
+#include <Arduino_BMI270_BMM150.h>
+#endif 
+
 #include <ArduinoBLE.h>
 
 String name = "Mesurify-Meter";
@@ -37,7 +48,15 @@ BLECharacteristic environmentCharacteristic(environment_uuid, BLENotify, 3 * siz
 
 void init_sensors(void){
   while(!APDS.begin()) { Serial.println("Error, APDS"); delay(500); };
+
+  #ifdef NANO_V1
   while(!HTS.begin()) { Serial.println("Error, HTS"); delay(500); };
+  #endif
+  
+  #ifdef NANO_V2
+  while(!HS300x.begin()) { Serial.println("Error, HTS"); delay(500); };
+  #endif
+  
   while(!BARO.begin()) { Serial.println("Error, BARO"); delay(500); };
   while(!IMU.begin()) { Serial.println("Error, IMU"); delay(500); };
 }
@@ -107,8 +126,17 @@ void manageIMU() {
 
 void manageEnvironment() {
   if (APDS.proximityAvailable()) { proximity = APDS.readProximity(); }
+
+  #ifdef NANO_V1
   temperature = HTS.readTemperature(); 
   humidity = HTS.readHumidity(); 
+  #endif
+
+  #ifdef NANO_V2
+  temperature = HS300x.readTemperature();
+  humidity = HS300x.readHumidity();
+  #endif
+
   pressure = BARO.readPressure();
   if (APDS.colorAvailable()) { APDS.readColor(red, green, blue, light); }
 

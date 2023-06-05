@@ -74,9 +74,7 @@ class Connector extends EventEmitter {
 			const characteristic = this.characteristics.find(characteristic => characteristic.name === characteristic_name);
 			if(!characteristic.handle) { console.log('The characteristic ' + characteristic_name + ' is not enabled!'); }
 			else { 
-				//console.log(characteristic);
-				//console.log(buffer);
-				characteristic.handle.readValue(buffer); 
+				console.log(characteristic);
 			}
 		} catch(err) {console.log('Cannot set sampling period ' + data + ' (' + err +')');}
 	}
