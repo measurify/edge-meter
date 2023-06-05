@@ -10,7 +10,7 @@ Edge Measurer is a board based on the [Arduino Nano BLE Sense](https://store.ard
 
 ![EdegeMeter](figures/top.png)
 
-EdgeMeter acquires values from sensors on the Arduino device and exposes the collected data using the on-board BLE connectivity. It provides IMU values (accelerometer, gyroscope and magnetometer) and environmental values (proximity, temperature, humidity, pressure and ambient light) as BLE characteristics. The sampling period can be decided by the connected client, the default value is 250 msec.
+EdgeMeter acquires values from sensors on the Arduino device and exposes the collected data using the on-board BLE connectivity. It provides IMU values (accelerometer, gyroscope and magnetometer), environmental values (proximity, temperature, humidity, pressure and ambient light) and orientation (heading, pitch, roll) as BLE characteristics. The sampling period can be decided by the connected client, the default value is 250 msec.
 
 Folder node-client contains an example of client application developed in NodeJS.
 
@@ -36,3 +36,10 @@ The BLE local name is **Mesurify-Meter** and it exposes a single BLE service (UU
 - Properties: notify
 - Data format: 3 float and 5 int
 - Values: proximity [0 close, 255 far], temperature [C], humidity [%], pressure [kPA], ambient light [0 dark] and color [RGB]
+
+## Orientation Characteristic
+
+- UUID: 8e7c2dae-000244b0d-b516-f525649c49ca
+- Properties: notify
+- Data format: array of 3 float
+- Values: heading [degree], pitch [dpdegrees], and roll [degree]

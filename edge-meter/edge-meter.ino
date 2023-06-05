@@ -13,14 +13,18 @@
 #include <Arduino_BMI270_BMM150.h>
 #endif 
 
+#include <MadgwickAHRS.h>
 #include <ArduinoBLE.h>
 
 String name = "Mesurify-Meter";
+
+Madgwick filter;
 
 const char* service_uuid = "8e7c2dae-0000-4b0d-b516-f525649c49ca";
 const char* sampling_period_uuid = "8e7c2dae-0001-4b0d-b516-f525649c49ca";
 const char* imu_uuid = "8e7c2dae-0002-4b0d-b516-f525649c49ca";
 const char* environment_uuid = "8e7c2dae-0003-4b0d-b516-f525649c49ca";
+const char* orientation_uuid = "8e7c2dae-0004-4b0d-b516-f525649c49ca";
 
 BLEService service(service_uuid);
 
@@ -45,6 +49,12 @@ float pressure;
 int light;
 int red, green, blue;
 BLECharacteristic environmentCharacteristic(environment_uuid, BLENotify, 3 * sizeof(float) + 5 * sizeof(int));
+
+// Orientation: 3 floats degress
+float heading;
+float pitch;
+float roll;
+BLECharacteristic orientationCharacteristic(orientation_uuid, BLENotify, 3 * sizeof(float)); 
 
 void init_sensors(void){
   while(!APDS.begin()) { Serial.println("Error, APDS"); delay(500); };
@@ -72,12 +82,16 @@ void init_BLE(){
   
   service.addCharacteristic(imuCharacteristic);
   service.addCharacteristic(environmentCharacteristic);
+  service.addCharacteristic(orientationCharacteristic);
 
   samplingPeriodCharacteristic.setEventHandler(BLEWritten, onSamplingPeriodCharacteristicWrite);
   service.addCharacteristic(samplingPeriodCharacteristic);
   
   BLE.addService(service);
   BLE.advertise();
+}
+void initFilter(){
+  filter.begin(1000/sampling_period);
 }
 
 void setup() {
@@ -89,10 +103,13 @@ void setup() {
   Serial.println("Init BLE...");  
   init_BLE();
 
+  Serial.println("Init Filter...");  
+  initFilter();
+
   Serial.println("Start loop...");  
 }
 
-void manageIMU() {
+void manageRawValues() {
   if (IMU.accelerationAvailable()) {
     float x, y, z;
     IMU.readAcceleration(x, y, z);
@@ -116,13 +133,28 @@ void manageIMU() {
     magnetic_field[1] = y;
     magnetic_field[2] = z;
   }
+}
 
+void manageIMU() {
   float imu[9] = { acceleration[0], acceleration[1], acceleration[2], 
                    angular_speed[0], angular_speed[1], angular_speed[2],
                    magnetic_field[0], magnetic_field[1], magnetic_field[2] 
                  };
   imuCharacteristic.writeValue(imu, sizeof(imu));
 } 
+
+void manageOrientation(){
+  filter.update(angular_speed[0], angular_speed[1], angular_speed[2],
+                acceleration[0], acceleration[1], acceleration[2],
+                magnetic_field[0], magnetic_field[1], magnetic_field[2]);
+
+  heading = filter.getYawRadians();
+  pitch = filter.getPitchRadians();
+  roll = filter.getRollRadians();
+
+  float orientation[3] = { heading, pitch, roll };
+  orientationCharacteristic.writeValue(orientation, sizeof(orientation));
+}
 
 void manageEnvironment() {
   if (APDS.proximityAvailable()) { proximity = APDS.readProximity(); }
@@ -161,6 +193,7 @@ void heartbit() {
         Serial.println(sampling_period);
         if (imuCharacteristic.subscribed()) Serial.println(" - IMU subscribed");
         if (environmentCharacteristic.subscribed()) Serial.println(" - Environment subscribed");
+        if (orientationCharacteristic.subscribed()) Serial.println(" - Orientation subscribed");
       }
       else {
         Serial.println("No BLE client connected...");
@@ -173,8 +206,10 @@ void loop() {
   heartbit();
   if (BLE.connected()) {
     if (millis() - sampling_previousMillis >= sampling_period) {
+      if (imuCharacteristic.subscribed() || orientationCharacteristic.subscribed()) { manageRawValues(); }
       if (imuCharacteristic.subscribed()) { manageIMU(); }
       if (environmentCharacteristic.subscribed()) { manageEnvironment(); }
+      if (orientationCharacteristic.subscribed()) { manageOrientation(); }
       sampling_previousMillis = millis();
     }
   } 

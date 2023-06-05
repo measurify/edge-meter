@@ -1,6 +1,6 @@
 # Measurify Collector
 
-Measurify Collector is Node.js module for the [Measurify Meter]() board. The module makes easy to listen to data from one or more sensors from the Meter board using a BLE connection and send the collected data to a Measurify server.
+Measurify Collector is Node.js module for the Measurify Meter board. The module makes easy to listen to data from one or more sensors from the Meter board using a BLE connection and send the collected data to a Measurify server.
 
 In oder to use the module, you have to import it, define the charactercist you are interested in and instantiate a new Connector object:
 

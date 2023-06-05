@@ -9,6 +9,7 @@ const service_uuid = '8e7c2dae-0000-4b0d-b516-f525649c49ca'
 const sampling_period_uuid = '8e7c2dae-0001-4b0d-b516-f525649c49ca'
 const imu_uuid = '8e7c2dae-0002-4b0d-b516-f525649c49ca'
 const environment_uuid = '8e7c2dae-0003-4b0d-b516-f525649c49ca'
+const orientation_uuid = '8e7c2dae-0004-4b0d-b516-f525649c49ca'
 
 class Connector extends EventEmitter {
 	bluethoot = null;
@@ -18,12 +19,18 @@ class Connector extends EventEmitter {
 
 	characteristics = [
 		{ name: 'sampling_period', uuid: sampling_period_uuid, properties: ['BLEWrite'], structure: ['Int16'], data: { sampling_period: 0 } },
+		
 		{ name: 'imu', uuid: imu_uuid, properties: ['BLENotify'],
 		  structure: ['Float32', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32'],
 		  data: { a_x: [], a_y: [], a_z: [], g_x: [], g_y: [], g_z: [], m_x: [], m_y: [], m_z: [] } },
+		
 		{ name: 'environment', uuid: environment_uuid, properties: ['BLENotify'],
 		  structure: ['Float32', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32', 'Float32'],
-		  data: { proximity: [], temperature: [], humidity: [], light: [], red: [], green: [], blue: [] } }
+		  data: { proximity: [], temperature: [], humidity: [], light: [], red: [], green: [], blue: [] } },
+		
+		{ name: 'orientation', uuid: orientation_uuid, properties: ['BLENotify'],
+		  structure: ['Float32', 'Float32', 'Float32'],
+		  data: { heading: [], pitch: [], roll: [] } },
 	];
 	
 	enables = [];

@@ -1,7 +1,5 @@
-// https://github.com/njanssen/node-arduino-nano-33-ble
-
 const Connector = require('./connector.js')
-const connector = new Connector(['imu', 'timing']);
+const connector = new Connector(['imu', 'orientation', 'environment', 'timing']);
 
 run = async function(){
 	console.log('Collector started...'); 
@@ -17,6 +15,10 @@ run = async function(){
 
 		connector.on('environment', data => { 
 			//console.log('Environment values:', data); 
+		});
+
+		connector.on('orientation', data => { 
+			console.log('Orientation values:', data); 
 		});
 	});
 
