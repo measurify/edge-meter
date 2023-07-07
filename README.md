@@ -12,6 +12,8 @@ Edge Measurer is a board based on the [Arduino Nano BLE Sense](https://store.ard
 
 EdgeMeter acquires values from sensors on the Arduino device and exposes the collected data using the on-board BLE connectivity. It provides IMU values (accelerometer, gyroscope and magnetometer), environmental values (proximity, temperature, humidity, pressure and ambient light) and orientation (heading, pitch, roll) as BLE characteristics. The sampling period can be decided by the connected client, the default value is 250 msec.
 
+Two versions of arduino are supported: Change the name in the first line of the file edge-meter.ino as NANO_V1 for **Arduino Nano 33 BLE Sense** or NANO_V2 for **Arduino Nano 33 BLE Sense REV2**.
+
 Folder node-client contains an example of client application developed in NodeJS.
 
 Current version of BLE only allows a maximum of 20 bytes for each message. To send the array of IMU and ENV values we had to convert each value to 16-bit signed integer (int16_t). Sensor resolution is 16 bit so no information is lost. Values are multiplied to a coefficient described below.
