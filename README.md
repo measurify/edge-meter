@@ -14,6 +14,8 @@ EdgeMeter acquires values from sensors on the Arduino device and exposes the col
 
 Folder node-client contains an example of client application developed in NodeJS.
 
+Current version of BLE only allows a maximum of 20 bytes for each message. To send the array of IMU and ENV values we had to convert each value to 16-bit signed integer (int16_t). Sensor resolution is 16 bit so no information is lost. Values are multiplied to a coefficient described below.
+
 The BLE local name is **Mesurify-Meter** and it exposes a single BLE service (UUID: 8e7c2dae-0000-4b0d-b516-f525649c49ca) featuring the following characteristics:
 
 ## Sampling Period Characteristic
@@ -27,19 +29,21 @@ The BLE local name is **Mesurify-Meter** and it exposes a single BLE service (UU
 
 - UUID: 8e7c2dae-0002-4b0d-b516-f525649c49ca
 - Properties: notify
-- Data format: array of 9 float
-- Values: acceleration [G], angular velocity [dps], and magnetic field [uT]
+- Original format: array of 9 float
+- Data format: array of 9 signed int 16 bit
+- Values: acceleration [G] * 8192 , angular velocity [dps] * 16.384 , and magnetic field [uT] * 81.92
 
 ## Environment Characteristic
 
 - UUID: 8e7c2dae-0003-4b0d-b516-f525649c49ca
 - Properties: notify
-- Data format: 3 float and 5 int
-- Values: proximity [0 close, 255 far], temperature [C], humidity [%], pressure [kPA], ambient light [0 dark] and color [RGB]
+- Original format: 3 float and 5 int
+- Data format: array of 8 signed int 16 bit
+- Values: proximity [0 close, 255 far], temperature [C] * 100 , humidity [%] * 100 , pressure [kPA] * 100 , ambient light [0 dark] and color [RGB]
 
 ## Orientation Characteristic
 
-- UUID: 8e7c2dae-000244b0d-b516-f525649c49ca
+- UUID: 8e7c2dae-0004-4b0d-b516-f525649c49ca
 - Properties: notify
 - Data format: array of 3 float
 - Values: heading [degree], pitch [dpdegrees], and roll [degree]
