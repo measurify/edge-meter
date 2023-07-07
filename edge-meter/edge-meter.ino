@@ -16,6 +16,14 @@
 #include <MadgwickAHRS.h>
 #include <ArduinoBLE.h>
 
+#define ACC_MULTIPLIER 8192
+#define GYR_MULTIPLIER 16.384
+#define MAG_MULTIPLIER 81.92
+#define TEMP_MULTIPLIER 100
+#define HUM_MULTIPLIER 100
+#define PRES_MULTIPLIER 100
+
+
 String name = "Mesurify-Meter";
 
 Madgwick filter;
@@ -35,20 +43,22 @@ unsigned long sampling_previousMillis = 0;
 unsigned long heartbit_previousMillis = 0;
 BLECharacteristic samplingPeriodCharacteristic(sampling_period_uuid,  BLEWrite | BLERead, sizeof(int));
 
-// IMU: 9 floats G, degress per second, uT
+// IMU: 9 ints G, degress per second, uT (G*8192,degrees per second*16.384,uT*81.92)
 float acceleration[3];
 float angular_speed[3];
 float magnetic_field[3];
-BLECharacteristic imuCharacteristic(imu_uuid, BLENotify, 9 * sizeof(float)); 
+BLECharacteristic imuCharacteristic(imu_uuid, BLENotify, 9 * sizeof(int16_t)); 
 
 // Environment: proximity, temperature, humidity, pressure, light, r, g, b  
-int proximity; 
-float temperature; 
-float humidity;
-float pressure;
+int16_t proximityInt16;
+int16_t temperatureInt16;
+int16_t humidityInt16;
+int16_t pressureInt16;
 int light;
 int red, green, blue;
-BLECharacteristic environmentCharacteristic(environment_uuid, BLENotify, 3 * sizeof(float) + 5 * sizeof(int));
+int16_t lightInt16;
+int16_t redInt16, greenInt16, blueInt16;
+BLECharacteristic environmentCharacteristic(environment_uuid, BLENotify, 8 * sizeof(int16_t));
 
 // Orientation: 3 floats degress
 float heading;
@@ -78,8 +88,8 @@ void init_BLE(){
 
   BLE.setLocalName(name.c_str());
   BLE.setDeviceName(name.c_str());
-  BLE.setAdvertisedService(service);
-  
+  BLE.setAdvertisedService(service); 
+   
   service.addCharacteristic(imuCharacteristic);
   service.addCharacteristic(environmentCharacteristic);
   service.addCharacteristic(orientationCharacteristic);
@@ -136,9 +146,9 @@ void manageRawValues() {
 }
 
 void manageIMU() {
-  float imu[9] = { acceleration[0], acceleration[1], acceleration[2], 
-                   angular_speed[0], angular_speed[1], angular_speed[2],
-                   magnetic_field[0], magnetic_field[1], magnetic_field[2] 
+  int16_t imu[9] = { (int16_t)round(acceleration[0]*ACC_MULTIPLIER), (int16_t)round(acceleration[1]*ACC_MULTIPLIER), (int16_t)round(acceleration[2]*ACC_MULTIPLIER), 
+                   (int16_t)round(angular_speed[0]*GYR_MULTIPLIER), (int16_t)round(angular_speed[1]*GYR_MULTIPLIER), (int16_t)round(angular_speed[2]*GYR_MULTIPLIER),
+                   (int16_t)round(magnetic_field[0]*MAG_MULTIPLIER), (int16_t)round(magnetic_field[1]*MAG_MULTIPLIER), (int16_t)round(magnetic_field[2]*MAG_MULTIPLIER) 
                  };
   imuCharacteristic.writeValue(imu, sizeof(imu));
 } 
@@ -157,22 +167,27 @@ void manageOrientation(){
 }
 
 void manageEnvironment() {
-  if (APDS.proximityAvailable()) { proximity = APDS.readProximity(); }
-
+  if (APDS.proximityAvailable()) { proximityInt16 = (int16_t)round(APDS.readProximity()); }
+  
   #ifdef NANO_V1
-  temperature = HTS.readTemperature(); 
-  humidity = HTS.readHumidity(); 
+  temperatureInt16 = (int16_t)round(HTS.readTemperature()*TEMP_MULTIPLIER); 
+  humidityInt16 = (int16_t)round(HTS.readHumidity()*HUM_MULTIPLIER); 
   #endif
 
   #ifdef NANO_V2
-  temperature = HS300x.readTemperature();
-  humidity = HS300x.readHumidity();
+  temperatureInt16 = (int16_t)round(HS300x.readTemperature()*TEMP_MULTIPLIER);
+  humidityInt16 = (int16_t)round(HS300x.readHumidity()*HUM_MULTIPLIER);
   #endif
 
-  pressure = BARO.readPressure();
-  if (APDS.colorAvailable()) { APDS.readColor(red, green, blue, light); }
+  pressureInt16 = (int16_t)round(BARO.readPressure()*PRES_MULTIPLIER);
+  if (APDS.colorAvailable()) { APDS.readColor(red, green, blue, light); 
+    redInt16 = (int16_t)round(red);
+    greenInt16 = (int16_t)round(green);
+    blueInt16 = (int16_t)round(blue);
+    lightInt16 = (int16_t)round(light);
+   }
 
-  float environment[8] = { proximity, temperature, humidity, pressure, light, red, green, blue };
+  int16_t environment[8] = { proximityInt16, temperatureInt16, humidityInt16, pressureInt16, lightInt16, redInt16, greenInt16, blueInt16 };
   environmentCharacteristic.writeValue(environment, sizeof(environment));
 } 
 
