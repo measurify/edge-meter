@@ -49,3 +49,13 @@ The BLE local name is **Mesurify-Meter** and it exposes a single BLE service (UU
 - Properties: notify
 - Data format: array of 3 float
 - Values: heading [degree], pitch [dpdegrees], and roll [degree]
+
+# Citation
+If you find the project helpful, please consider citing our paper:
+
+[1] M. Fresta, A. Dabbous, F. Bellotti, A. Capello, L. Lazzaroni, A. Pighetti, R. Berta.
+ **Low-Cost, Edge-Cloud, End-to-End System Architecture for Human Activity Data Collection**. Applications in Electronics Pervading Industry, Environment and Society. ApplePies 2023. Lecture Notes in Electrical Engineering, vol 1110. Springer, Cham. [LINK](https://doi.org/10.1007/978-3-031-48121-5_64)
+
+[2] A. Dabbous, M. Fresta, F. Bellotti, R. Berta. **Neural Architecture for Tennis Shot Classification on Embedded System**. Applications in Electronics Pervading Industry, Environment and Society. ApplePies 2023. Lecture Notes in Electrical Engineering, vol 1110. Springer, Cham. [LINK](https://doi.org/10.1007/978-3-031-48121-5_14)
+
+[3] A. Dabbous, M. Fresta, F. Bellotti, R. Berta. **Arduino Nano-based System for Tennis Shot Classification**. 54th Annual Meeting of the Italian Electronics Society, SIE 2023, Noto, Italy, 2023. [LINK](https://doi.org/10.1007/978-3-031-48711-8_43)

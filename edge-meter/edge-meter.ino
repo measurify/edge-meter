@@ -37,7 +37,7 @@ const char* orientation_uuid = "8e7c2dae-0004-4b0d-b516-f525649c49ca";
 BLEService service(service_uuid);
 
 // Loop delay
-int sampling_period = 250;
+int sampling_period = 100;
 int heartbit_period = 5000;
 unsigned long sampling_previousMillis = 0;
 unsigned long heartbit_previousMillis = 0;
